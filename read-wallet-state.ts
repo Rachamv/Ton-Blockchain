@@ -1,0 +1,20 @@
+import { getHttpEndpoint } from "@orbs-network/ton-access";
+import { mnemonicToWalletKey } from "@ton/crypto";
+import { TonClient, WalletContractV4, fromNano } from "@ton/ton";
+
+async function main() {
+    const mnemonic = `champion idle fat error iron nothing zoo degree victory snack chicken sniff organ style weasel parade find angry clap increase orange story bulb squeeze`;
+    const key = await mnemonicToWalletKey(mnemonic.split(" "));
+    const wallet = WalletContractV4.create({ publicKey: key.publicKey, workchain: 0 });
+    const endpoint = await getHttpEndpoint({ network: "testnet" });
+    const client = new TonClient({ endpoint });
+
+    const balance = await client.getBalance(wallet.address);
+    console.log("balance:", fromNano(balance));
+
+    const walletContract = client.open(wallet);
+    const seqno = await walletContract.getSeqno();
+    console.log("seqno:", seqno);
+}
+
+main();
